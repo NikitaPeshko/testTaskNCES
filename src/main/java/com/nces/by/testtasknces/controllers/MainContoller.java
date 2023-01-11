@@ -2,6 +2,8 @@ package com.nces.by.testtasknces.controllers;
 
 
 import com.nces.by.testtasknces.entity.Currency;
+import com.nces.by.testtasknces.exception.DataIncorrectException;
+import com.nces.by.testtasknces.exception.NoEntityException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -47,14 +49,15 @@ public class MainContoller {
 
         Currency[] forObject = restTemplate
                 .getForObject(fooResourceUrl, Currency[].class);
-        Arrays.stream(forObject).map(Currency::getСurOfficialRate).forEach(System.out::println);
+        if(forObject.length==0){
+            throw new NoEntityException("No currency for this date","SOMERRORCODE")
+        }
 
         return forObject;
 
 
 
 
-       // return "index";
 
     }
 
@@ -68,7 +71,7 @@ public class MainContoller {
         if(result == 0)
             System.out.println("Both dates are equal");
         else if (result > 0)
-            throw new Exception("Date end cannot bigger than start");
+            throw new DataIncorrectException("The end date connot bigger than start date","Some Errorcode");
 
     }
 
