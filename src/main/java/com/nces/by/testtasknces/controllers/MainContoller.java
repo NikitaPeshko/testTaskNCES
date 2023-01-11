@@ -27,7 +27,7 @@ public class MainContoller {
     @RequestMapping("/currency")
     public Currency[] getCurrency(@RequestParam String currencies,
                               @RequestParam String startdate,
-                              @RequestParam String enddate ,Model model) throws IOException {
+                              @RequestParam String enddate ,Model model) throws IOException, NoEntityException {
 
 
         try {
