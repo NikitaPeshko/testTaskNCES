@@ -50,7 +50,7 @@ public class MainContoller {
         Currency[] forObject = restTemplate
                 .getForObject(fooResourceUrl, Currency[].class);
         if(forObject.length==0){
-            throw new NoEntityException("No currency for this date","SOMERRORCODE")
+            throw new NoEntityException("No currency for this date","SOMERRORCODE");
         }
 
         return forObject;
