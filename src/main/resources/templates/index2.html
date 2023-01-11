@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./css/style.css">
+    <title>Document</title>
+</head>
+<body>
+    <div class="wrapper">
+
+        <div class="currency">
+            <div class="currency_menu">
+
+                <form id="currency__form" action="#" method="get" >
+                    <select class="selected__currency" id="selected__currency" >
+                        <option value="292" ><span>Евро (EUR)</span></option>
+                        <option value="145" ><span>Доллар США (USD)</span></option>
+                        <option value="298" ><span>Российский рубль (RUB)</span></option>
+                        <option value="28" ><span>Китайский Юань (CNY)</span></option>
+                    </select>
+                    <div class="date_row">
+                        <div class="date__title">
+                            <p>За период:</p>
+                        </div>
+                       
+                        <div class="date_start">
+                            <label for="">C:</label>
+                            <input type="date"  name="startdate" value="2021-01-04">
+    
+                        </div>
+                        <div class="date_end">
+                            <label for="">До:</label>
+                            <input type="date"  name="enddate" value="2022-01-11">
+                        </div>
+
+
+                    </div>
+                    
+                    
+                    
+                    <button class="button_submit" type="submit">Вывести</button>
+                </form>
+                
+
+            </div>
+            
+        </div>
+        <div class="currency__graphicks">
+            <div id="curve_chart" style="width: 900px; height: 500px"></div>
+
+        </div>
+        
+    </div>
+
+
+
+
+
+
+
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+   
+    <script type="text/javascript">
+
+
+        const form = document.getElementById("currency__form");
+        const btn= document.getElementsByClassName("button_submit")[0];
+        btn.addEventListener('click',functSubmit);
+        //form.addEventListener('submit', functSubmit);
+        
+        
+        function functSubmit(event) {
+            const currencies=document.getElementById('selected__currency').value;
+            console.log(currencies);
+            const startdate= form.elements["startdate"].value;
+            const enddate= form.elements["enddate"].value;
+            console.log(currencies);
+            console.log(startdate);
+            console.log(enddate);
+            const URLlink=`https://www.nbrb.by/API/ExRates/Rates/Dynamics/${currencies}?startDate=${startdate}&&endDate=${enddate}`;
+            console.log(URLlink);
+            getResponse(URLlink);
+         
+            
+
+
+        }
+
+
+    
+        
+        async function getResponse(url) {
+	        const response = await fetch(url);
+            const data1 = await response.json();
+            console.log(data1);
+            
+            
+
+            var arr = new Array();
+            for(var i=0; i<data1.length; i++){
+                arr[i] = new Array();
+                for(var j=0; j<2; j++){
+                    arr[i][1] = data1[i].Cur_OfficialRate;
+                    arr[i][0] = data1[i].Date.substring(0,10);
+                }
+            }
+           // console.log(arr);
+            localStorage.setItem("key2",JSON.stringify(arr));
+
+            google.charts.load('current', {'packages':['corechart']});
+            google.charts.setOnLoadCallback(drawChart);
+
+            
+            
+        
+
+        }
+        
+
+      
+
+      function drawChart() {
+            let arr=JSON.parse( localStorage.getItem("key2")) ;
+            
+            arr[0]= ["Date", "Currency"];
+        
+          
+          var data = google.visualization.arrayToDataTable(
+            arr
+        
+          );
+
+        var options = {
+          title: 'Currency',
+          curveType: 'function',
+          legend: { position: 'bottom' }
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+
+        chart.draw(data, options);
+        
+        
+      }
+     
+
+
+      
+       
+     
+
+      
+        
+
+      
+    </script>
+    
+</body>
+</html>
