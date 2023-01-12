@@ -13,4 +13,10 @@ public class Advice {
         Response response = new Response(e.getMessage(),e.getErrorcode());
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @ExceptionHandler(DataIncorrectException.class)
+    public ResponseEntity<Response> handleException(DataIncorrectException e) {
+        Response response = new Response(e.getMessage(),e.getErrorcode());
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 }

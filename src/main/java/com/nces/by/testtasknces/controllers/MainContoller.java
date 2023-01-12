@@ -4,6 +4,8 @@ package com.nces.by.testtasknces.controllers;
 import com.nces.by.testtasknces.entity.Currency;
 import com.nces.by.testtasknces.exception.DataIncorrectException;
 import com.nces.by.testtasknces.exception.NoEntityException;
+import com.nces.by.testtasknces.source.GetJSON;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -16,66 +18,20 @@ import java.util.Arrays;
 import java.util.Date;
 
 @RestController
+@RequestMapping("/api/v1")
 public class MainContoller {
 
+    @Autowired
+    private GetJSON getJSON;
 
-    @GetMapping("/currencies")
-    public String getCurrencies(){
-        return "index";
+
+    @GetMapping("/currency")
+    public Currency[] getCurrency(@RequestParam( defaultValue = "298") String currencies,
+                              @RequestParam (defaultValue = "2021-06-01")String startdate,
+                              @RequestParam (defaultValue = "2022-06-06")String enddate ) throws IOException, NoEntityException {
+
+
+        Currency[] json = getJSON.getJSON(currencies, startdate, enddate);
+        return json;
     }
-
-    @RequestMapping("/currency")
-    public Currency[] getCurrency(@RequestParam String currencies,
-                              @RequestParam String startdate,
-                              @RequestParam String enddate ,Model model) throws IOException, NoEntityException {
-
-
-        try {
-            checkDateCorrect(startdate,enddate);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
-
-        System.out.println(startdate);
-        System.out.println(enddate);
-        System.out.println(currencies);
-        RestTemplate restTemplate = new RestTemplate();
-
-        String fooResourceUrl
-                = "https://www.nbrb.by/API/ExRates/Rates/Dynamics/"+currencies+"?startDate="+startdate+"&&endDate="+enddate;
-        System.out.println(fooResourceUrl);
-
-
-        Currency[] forObject = restTemplate
-                .getForObject(fooResourceUrl, Currency[].class);
-        if(forObject.length==0){
-            throw new NoEntityException("No currency for this date","SOMERRORCODE");
-        }
-
-        return forObject;
-
-
-
-
-
-    }
-
-    private void checkDateCorrect(String startDate,String endDate) throws Exception {
-        SimpleDateFormat format = new SimpleDateFormat();
-        format.applyPattern("yyyy-MM-dd");
-        Date startDate1= format.parse(startDate);
-        Date endDate1= format.parse(endDate);
-        int result = startDate1.compareTo(endDate1);
-
-        if(result == 0)
-            System.out.println("Both dates are equal");
-        else if (result > 0)
-            throw new DataIncorrectException("The end date connot bigger than start date","Some Errorcode");
-
-    }
-
-
-
-
 }
